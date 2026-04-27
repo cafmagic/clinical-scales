@@ -1,0 +1,412 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSQI 匹茲堡睡眠品質量表 - 臨床自動計分系統</title>
+    <style>
+        :root {
+            --primary-color: #455a64;
+            --accent-color: #3498db;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --border-color: #cfd8dc;
+            --text-color: #263238;
+            --alert-color: #d32f2f;
+        }
+
+        body {
+            font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 15px;
+            margin-top: 0;
+        }
+
+        .instruction {
+            background: #e1f5fe;
+            padding: 15px;
+            border-left: 5px solid var(--accent-color);
+            margin-bottom: 25px;
+            font-size: 0.95em;
+        }
+
+        .section-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 25px 0 15px 0;
+            font-weight: bold;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-row:last-child { border-bottom: none; }
+
+        .label-text {
+            flex: 2;
+            padding-right: 15px;
+        }
+
+        .input-area {
+            flex: 1;
+            text-align: right;
+        }
+
+        input[type="time"], input[type="number"], select {
+            width: 100%;
+            max-width: 200px;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #37474f;
+        }
+
+        #result-panel {
+            display: none;
+            margin-top: 40px;
+            padding: 25px;
+            background: #fff;
+            border: 2px solid var(--accent-color);
+            border-radius: 12px;
+        }
+
+        .global-score-box {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f0f7ff;
+            border-radius: 8px;
+        }
+
+        .score-large {
+            font-size: 3em;
+            font-weight: bold;
+            color: var(--alert-color);
+        }
+
+        .component-detail {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #fafafa;
+            border-left: 4px solid #90a4ae;
+            font-size: 0.9em;
+        }
+
+        .component-title {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .calculation-process {
+            color: #546e7a;
+            font-style: italic;
+            border-top: 1px dashed #ccc;
+            margin-top: 8px;
+            padding-top: 8px;
+        }
+
+        footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.85em;
+            color: #78909c;
+            text-align: justify;
+        }
+
+        .math {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        @media print {
+            button { display: none; }
+            .container { box-shadow: none; border: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>PSQI 匹茲堡睡眠品質量表</h1>
+    
+    <div class="instruction">
+        本量表用於評估受試者過去一個月內的睡眠品質。請依據實際狀況回答所有問題。
+    </div>
+
+    <!-- Section 1: Basic Times -->
+    <div class="section-header">一、 睡眠時間習慣</div>
+    <div class="form-row">
+        <div class="label-text">1. 過去一個月，晚上通常幾點上床睡覺？</div>
+        <div class="input-area"><input type="time" id="q1" value="23:00"></div>
+    </div>
+    <div class="form-row">
+        <div class="label-text">2. 過去一個月，上床後通常需要多久才能入睡？(分鐘)</div>
+        <div class="input-area"><input type="number" id="q2" value="20" min="0"></div>
+    </div>
+    <div class="form-row">
+        <div class="label-text">3. 過去一個月，早上通常幾點起床？</div>
+        <div class="input-area"><input type="time" id="q3" value="07:00"></div>
+    </div>
+    <div class="form-row">
+        <div class="label-text">4. 過去一個月，每晚實際睡著的時間約幾小時？(不等於躺床時間)</div>
+        <div class="input-area"><input type="number" id="q4" value="7" step="0.1" min="0"></div>
+    </div>
+
+    <!-- Section 2: Disturbances -->
+    <div class="section-header">二、 睡眠干擾頻率 (0=從未, 1=每週<1次, 2=每週1-2次, 3=每週≥3次)</div>
+    <div id="q5-container"></div>
+
+    <!-- Section 3: Others -->
+    <div class="section-header">三、 主觀品質、藥物與日間功能</div>
+    <div class="form-row">
+        <div class="label-text">6. 過去一個月，您自評整體的睡眠品質如何？</div>
+        <div class="input-area">
+            <select id="q6">
+                <option value="0">非常好 (0)</option>
+                <option value="1">還算好 (1)</option>
+                <option value="2">不太好 (2)</option>
+                <option value="3">非常不好 (3)</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="label-text">7. 過去一個月，您使用藥物幫助睡眠的頻率？</div>
+        <div class="input-area"><select id="q7" class="freq-select"></select></div>
+    </div>
+    <div class="form-row">
+        <div class="label-text">8. 過去一個月，在開車、吃飯或從事社交活動時，感到難以保持清醒的頻率？</div>
+        <div class="input-area"><select id="q8" class="freq-select"></select></div>
+    </div>
+    <div class="form-row">
+        <div class="label-text">9. 過去一個月，對您而言要拿出足夠精力去完成事情有多大的困難？</div>
+        <div class="input-area">
+            <select id="q9">
+                <option value="0">完全沒有困難 (0)</option>
+                <option value="1">只有一點困難 (1)</option>
+                <option value="2">有些困難 (2)</option>
+                <option value="3">非常大的困難 (3)</option>
+            </select>
+        </div>
+    </div>
+
+    <button onclick="calculatePSQI()">執行臨床計分並生成報告</button>
+
+    <!-- Results Section -->
+    <div id="result-panel">
+        <div class="global-score-box">
+            <div style="color: #546e7a; font-weight: bold;">PSQI 全域總分 (Global Score)</div>
+            <div class="score-large" id="total-score">0</div>
+            <div id="score-interpretation" style="margin-top: 10px; font-weight: bold;"></div>
+        </div>
+
+        <h3 style="border-bottom: 2px solid #ccc; padding-bottom: 5px;">子項目計分明細 (Components Detail)</h3>
+        <div id="details-container"></div>
+    </div>
+
+    <footer>
+        <strong>版權與引用說明：</strong><br>
+        本工具依據 Buysse 等人 (1989) 發表之「匹茲堡睡眠品質量表 (Pittsburgh Sleep Quality Index, PSQI)」開發。本量表版權歸屬原作者與匹茲堡大學所有。此數位工具僅供非營利之臨床評估參考使用。醫療診斷請以專業醫師判斷為準。<br><br>
+        <strong>文獻引用：</strong><br>
+        Buysse, D. J., Reynolds, C. F., 3rd, Monk, T. H., Berman, S. R., & Kupfer, D. J. (1989). The Pittsburgh Sleep Quality Index: a new instrument for psychiatric practice and research. <i>Psychiatry Research</i>, 28(2), 193–213. https://doi.org/10.1016/0165-1781(89)90047-4
+    </footer>
+</div>
+
+<script>
+    const freqOptions = `
+        <option value="0">從未發生 (0)</option>
+        <option value="1">每週不到一次 (1)</option>
+        <option value="2">每週一至兩次 (2)</option>
+        <option value="3">每週三次或以上 (3)</option>
+    `;
+
+    const q5Labels = {
+        'q5a': '5a. 無法在 30 分鐘內入睡',
+        'q5b': '5b. 半夜醒來或早醒',
+        'q5c': '5c. 需要起床上廁所',
+        'q5d': '5d. 呼吸不順暢',
+        'q5e': '5e. 咳嗽或打呼',
+        'q5f': '5f. 感覺很冷',
+        'q5g': '5g. 感覺很熱',
+        'q5h': '5h. 作惡夢',
+        'q5i': '5i. 身上感覺疼痛',
+        'q5j': '5j. 其他影響睡眠的事情'
+    };
+
+    // Initialize UI
+    window.onload = () => {
+        const container = document.getElementById('q5-container');
+        for (let key in q5Labels) {
+            container.innerHTML += `
+                <div class="form-row">
+                    <div class="label-text">${q5Labels[key]}</div>
+                    <div class="input-area"><select id="${key}">${freqOptions}</select></div>
+                </div>
+            `;
+        }
+        document.querySelectorAll('.freq-select').forEach(el => el.innerHTML = freqOptions);
+    };
+
+    function calculatePSQI() {
+        const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
+        const getInt = (id) => parseInt(document.getElementById(id).value) || 0;
+
+        // --- C1: 主觀睡眠品質 ---
+        const c1 = getInt('q6');
+        const c1_detail = `直接取 Q6 得分：${c1}`;
+
+        // --- C2: 睡眠潛伏期 ---
+        const q2_val = getVal('q2');
+        const q5a_val = getInt('q5a');
+        let q2_score = 0;
+        if (q2_val > 60) q2_score = 3;
+        else if (q2_val >= 31) q2_score = 2;
+        else if (q2_val >= 16) q2_score = 1;
+        
+        const c2_sum = q2_score + q5a_val;
+        let c2 = 0;
+        if (c2_sum >= 5) c2 = 3;
+        else if (c2_sum >= 3) c2 = 2;
+        else if (c2_sum >= 1) c2 = 1;
+        const c2_detail = `Step 1 (Q2時間轉換): ${q2_val}分 -> ${q2_score}分<br>Step 2 (Q2分 + Q5a分): ${q2_score} + ${q5a_val} = ${c2_sum}<br>Step 3 (總和轉換): 總和${c2_sum}對應子項目分為 ${c2}`;
+
+        // --- C3: 睡眠時數 ---
+        const q4_val = getVal('q4');
+        let c3 = 0;
+        if (q4_val < 5) c3 = 3;
+        else if (q4_val < 6) c3 = 2;
+        else if (q4_val < 7) c3 = 1;
+        const c3_detail = `實際睡眠時數 ${q4_val} 小時 -> 對應分數 ${c3} ( <5h=3, 5-6h=2, 6-7h=1, >7h=0 )`;
+
+        // --- C4: 習慣性睡眠效率 ---
+        const t1 = document.getElementById('q1').value;
+        const t3 = document.getElementById('q3').value;
+        let [h1, m1] = t1.split(':').map(Number);
+        let [h3, m3] = t3.split(':').map(Number);
+        let bedMins = h1 * 60 + m1;
+        let wakeMins = h3 * 60 + m3;
+        let totalBedMins = wakeMins - bedMins;
+        if (totalBedMins <= 0) totalBedMins += 1440;
+        const totalBedHours = totalBedMins / 60;
+        const efficiency = (q4_val / totalBedHours) * 100;
+        let c4 = 0;
+        if (efficiency < 65) c4 = 3;
+        else if (efficiency < 75) c4 = 2;
+        else if (efficiency < 85) c4 = 1;
+        const c4_detail = `躺床總時數: ${totalBedHours.toFixed(2)} 小時<br>效率: (${q4_val} / ${totalBedHours.toFixed(2)}) * 100 = ${efficiency.toFixed(1)}%<br>轉換: ${efficiency.toFixed(1)}% 對應子項目分為 ${c4}`;
+
+        // --- C5: 睡眠干擾 ---
+        let c5_sum = 0;
+        ['b','c','d','e','f','g','h','i','j'].forEach(k => c5_sum += getInt('q5'+k));
+        let c5 = 0;
+        if (c5_sum >= 19) c5 = 3;
+        else if (c5_sum >= 10) c5 = 2;
+        else if (c5_sum >= 1) c5 = 1;
+        const c5_detail = `Q5b ~ Q5j 之總和為 ${c5_sum}<br>轉換: 總和${c5_sum}對應子項目分為 ${c5} ( 1-9=1, 10-18=2, 19-27=3 )`;
+
+        // --- C6: 安眠藥物使用 ---
+        const c6 = getInt('q7');
+        const c6_detail = `直接取 Q7 得分：${c6}`;
+
+        // --- C7: 日間功能障礙 ---
+        const q8_val = getInt('q8');
+        const q9_val = getInt('q9');
+        const c7_sum = q8_val + q9_val;
+        let c7 = 0;
+        if (c7_sum >= 5) c7 = 3;
+        else if (c7_sum >= 3) c7 = 2;
+        else if (c7_sum >= 1) c7 = 1;
+        const c7_detail = `Step 1 (Q8 + Q9): ${q8_val} + ${q9_val} = ${c7_sum}<br>Step 2 (總和轉換): 總和${c7_sum}對應子項目分為 ${c7} ( 1-2=1, 3-4=2, 5-6=3 )`;
+
+        // --- Final Global Score ---
+        const total = c1 + c2 + c3 + c4 + c5 + c6 + c7;
+        document.getElementById('total-score').innerText = total;
+        
+        const interp = document.getElementById('score-interpretation');
+        if (total > 5) {
+            interp.innerHTML = `<span style="color:red;">診斷：睡眠品質不良 (Poor Sleeper)</span>`;
+        } else {
+            interp.innerHTML = `<span style="color:green;">診斷：睡眠品質良好 (Good Sleeper)</span>`;
+        }
+
+        // Render details
+        const components = [
+            { t: 'C1. 主觀睡眠品質', s: c1, p: c1_detail },
+            { t: 'C2. 睡眠潛伏期', s: c2, p: c2_detail },
+            { t: 'C3. 睡眠時數', s: c3, p: c3_detail },
+            { t: 'C4. 習慣性睡眠效率', s: c4, p: c4_detail },
+            { t: 'C5. 睡眠干擾', s: c5, p: c5_detail },
+            { t: 'C6. 使用睡眠藥物', s: c6, p: c6_detail },
+            { t: 'C7. 日間功能障礙', s: c7, p: c7_detail }
+        ];
+
+        let detailsHTML = '';
+        components.forEach(c => {
+            detailsHTML += `
+                <div class="component-detail">
+                    <div class="component-title">
+                        <span>${c.t}</span>
+                        <span>得分: ${c.s}</span>
+                    </div>
+                    <div class="calculation-process">計分過程：${c.p}</div>
+                </div>
+            `;
+        });
+        document.getElementById('details-container').innerHTML = detailsHTML;
+        document.getElementById('result-panel').style.display = 'block';
+        document.getElementById('result-panel').scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
