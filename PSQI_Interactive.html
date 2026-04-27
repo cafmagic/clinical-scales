@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSQI 睡眠品質量表 - 數位點擊版</title>
+    <style>
+        :root {
+            --primary-bg: #ffffff;
+            --secondary-bg: #f8f9fa;
+            --text-color: #333333;
+            --border-color: #dddddd;
+            --accent-blue: #2c3e50;
+            --highlight: #e3f2fd;
+        }
+
+        body {
+            font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+            background-color: #f0f2f5;
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .paper {
+            background-color: var(--primary-bg);
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 40px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-radius: 8px;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--accent-blue);
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+        }
+
+        h1 { margin: 5px 0; font-size: 22pt; color: var(--accent-blue); }
+
+        .instruction-box {
+            border-left: 4px solid var(--accent-blue);
+            padding: 15px;
+            margin-bottom: 25px;
+            font-size: 11pt;
+            background-color: var(--secondary-bg);
+        }
+
+        .question-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .question-title {
+            font-weight: bold;
+            font-size: 12pt;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 15px;
+            font-size: 11pt;
+        }
+
+        input[type="time"], input[type="number"], input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 11pt;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 12px 8px;
+            text-align: center;
+        }
+
+        th { background-color: var(--secondary-bg); }
+        td:first-child { text-align: left; width: 40%; font-weight: bold;}
+
+        /* 讓整格 td 都可以點擊，適合平板觸控 */
+        td label {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        td:hover:not(:first-child) {
+            background-color: var(--highlight);
+        }
+
+        input[type="radio"] {
+            transform: scale(1.3);
+            margin-right: 5px;
+            cursor: pointer;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-left: 15px;
+        }
+
+        .radio-item label {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background: var(--secondary-bg);
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: 0.2s;
+        }
+
+        .radio-item label:hover {
+            background: var(--highlight);
+            border-color: #90caf9;
+        }
+
+        .btn-group {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 12pt;
+            margin: 0 10px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #1a252f;
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+        }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+
+<div class="paper">
+    <header>
+        <h1>匹茲堡睡眠品質量表 (PSQI)</h1>
+    </header>
+
+    <div class="instruction-box">
+        <b>指導語：</b>以下問題是關於您在<b>過去一個月內</b>的睡眠習慣。您的回答應能反映您在過去一個月中大多數白天與晚上的實際情況。請點選最符合您情況的選項。
+    </div>
+
+    <form id="psqi-form">
+        <div class="question-section">
+            <label class="question-title">1. 過去一個月，您晚上通常幾點上床睡覺？</label>
+            <div class="input-group">
+                通常在 <input type="time" required> 上床。
+            </div>
+        </div>
+
+        <div class="question-section">
+            <label class="question-title">2. 過去一個月，您在晚上上床後，通常需要多久（幾分鐘）才能入睡？</label>
+            <div class="input-group">
+                約 <input type="number" min="0" style="width:80px;" required> 分鐘。
+            </div>
+        </div>
+
+        <div class="question-section">
+            <label class="question-title">3. 過去一個月，您早上通常幾點起床？</label>
+            <div class="input-group">
+                通常在 <input type="time" required> 起床。
+            </div>
+        </div>
+
+        <div class="question-section">
+            <label class="question-title">4. 過去一個月，您每晚實際睡著的時間約有幾個小時？（不包含躺在床上醒著的時間）</label>
+            <div class="input-group">
+                約 <input type="number" step="0.5" min="0" style="width:80px;" required> 小時。
+            </div>
+        </div>
+
+        <div class="question-section">
+            <label class="question-title">5. 過去一個月，您是否因為下列問題而感到睡眠受擾？</label>
+            <table>
+                <thead>
+                    <tr>
+                        <th>睡眠受擾原因</th>
+                        <th>從未發生</th>
+                        <th>每週不到一次</th>
+                        <th>每週一至二次</th>
+                        <th>每週三次或以上</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>a. 無法在 30 分鐘內入睡</td>
+                        <td><label><input type="radio" name="q5a" value="0" required></label></td>
+                        <td><label><input type="radio" name="q5a" value="1"></label></td>
+                        <td><label><input type="radio" name="q5a" value="2"></label></td>
+                        <td><label><input type="radio" name="q5a" value="3"></label></td>
+                    </tr>
+                    <tr>
+                        <td>b. 半夜醒來或早醒</td>
+                        <td><label><input type="radio" name="q5b" value="0" required></label></td>
+                        <td><label><input type="radio" name="q5b" value="1"></label></td>
+                        <td><label><input type="radio" name="q5b" value="2"></label></td>
+                        <td><label><input type="radio" name="q5b" value="3"></label></td>
+                    </tr>
+                    <tr>
+                        <td>c. 必須起來上廁所</td>
+                        <td><label><input type="radio" name="q5c" value="0" required></label></td>
+                        <td><label><input type="radio" name="q5c" value="1"></label></td>
+                        <td><label><input type="radio" name="q5c" value="2"></label></td>
+                        <td><label><input type="radio" name="q5c" value="3"></label></td>
+                    </tr>
+                    <tr>
+                        <td>d. 呼吸不順暢</td>
+                        <td><label><input type="radio" name="q5d" value="0" required></label></td>
+                        <td><label><input type="radio" name="q5d" value="1"></label></td>
+                        <td><label><input type="radio" name="q5d" value="2"></label></td>
+                        <td><label><input type="radio" name="q5d" value="3"></label></td>
+                    </tr>
+                    <tr>
+                        <td>e. 咳嗽或大聲打呼</td>
+                        <td><label><input type="radio" name="q5e" value="0" required></label></td>
+                        <td><label><input type="radio" name="q5e" value="1"></label></td>
+                        <td><label><input type="radio" name="q5e" value="2"></label></td>
+                        <td><label><input type="radio" name="q5e" value="3"></label></td>
+                    </tr>
+                    <tr>
+                        <td>f. 感覺太冷</td>
+                        <td><label><input type="radio" name="q5f" value="0" required></label></td>
+                        <td><label><input type="radio" name="q5f" value="1"></label></td>
+                        <td><label><input type="radio" name="q5f" value="2"></label></td>
+                        <td><label><input type="radio" name="q5f" value="3"></label></td>
+                    </tr>
+                    <tr>
+                        <td>g. 感覺太熱</td>
+                        <td><label><input type="radio" name="q5g" value="0" required></label></td>
+                        <td><label><input type="radio" name="q5g" value="1"></label></td>
+                        <td><label><input type="radio" name="q5g" value="2"></label></td>
+                        <td><label><input type="radio" name="q5g" value="3"></label></td>
+                    </tr>
+                    <tr>
+                        <td>h. 作惡夢</td>
+                        <td><label><input type="radio" name="q5h" value="0" required></label></td>
+                        <td><label><input type="radio" name="q5h" value="1"></label></td>
+                        <td><label><input type="radio" name="q5h" value="2"></label></td>
+                        <td><label><input type="radio" name="q5h" value="3"></label></td>
+                    </tr>
+                    <tr>
+                        <td>i. 身上感覺疼痛</td>
+                        <td><label><input type="radio" name="q5i" value="0" required></label></td>
+                        <td><label><input type="radio" name="q5i" value="1"></label></td>
+                        <td><label><input type="radio" name="q5i" value="2"></label></td>
+                        <td><label><input type="radio" name="q5i" value="3"></label></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="question-section">
+            <label class="question-title">6. 過去一個月，整體而言，您自評您的睡眠品質如何？</label>
+            <div class="radio-group">
+                <div class="radio-item"><label><input type="radio" name="q6" value="0" required> 非常好</label></div>
+                <div class="radio-item"><label><input type="radio" name="q6" value="1"> 還算好</label></div>
+                <div class="radio-item"><label><input type="radio" name="q6" value="2"> 不太好</label></div>
+                <div class="radio-item"><label><input type="radio" name="q6" value="3"> 非常不好</label></div>
+            </div>
+        </div>
+
+        <div class="question-section">
+            <label class="question-title">7. 過去一個月，您平均每週使用藥物（醫師處方或成藥）來幫助睡眠的頻率？</label>
+            <div class="radio-group">
+                <div class="radio-item"><label><input type="radio" name="q7" value="0" required> 從未發生</label></div>
+                <div class="radio-item"><label><input type="radio" name="q7" value="1"> 每週不到一次</label></div>
+                <div class="radio-item"><label><input type="radio" name="q7" value="2"> 每週一至二次</label></div>
+                <div class="radio-item"><label><input type="radio" name="q7" value="3"> 每週三次或以上</label></div>
+            </div>
+        </div>
+
+        <div class="question-section">
+            <label class="question-title">8. 過去一個月，當您在開車、用餐或從事社交活動時，感到難以保持清醒的頻率？</label>
+            <div class="radio-group">
+                <div class="radio-item"><label><input type="radio" name="q8" value="0" required> 從未發生</label></div>
+                <div class="radio-item"><label><input type="radio" name="q8" value="1"> 每週不到一次</label></div>
+                <div class="radio-item"><label><input type="radio" name="q8" value="2"> 每週一至二次</label></div>
+                <div class="radio-item"><label><input type="radio" name="q8" value="3"> 每週三次或以上</label></div>
+            </div>
+        </div>
+
+        <div class="question-section">
+            <label class="question-title">9. 過去一個月，您覺得要在白天打起精神來完成事情有多大的困難？</label>
+            <div class="radio-group">
+                <div class="radio-item"><label><input type="radio" name="q9" value="0" required> 完全沒有困難</label></div>
+                <div class="radio-item"><label><input type="radio" name="q9" value="1"> 只有一點困難</label></div>
+                <div class="radio-item"><label><input type="radio" name="q9" value="2"> 有些困難</label></div>
+                <div class="radio-item"><label><input type="radio" name="q9" value="3"> 非常大的困難</label></div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button type="reset" class="btn btn-secondary">重新填寫</button>
+            <a href="index.html" class="btn">返回工具箱</a>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

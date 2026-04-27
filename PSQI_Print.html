@@ -1,0 +1,266 @@
+# 生成去機構化版本的 PSQI 問卷 HTML
+html_questionnaire_generic = """
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSQI 睡眠品質量表 - 標準問卷版</title>
+    <style>
+        :root {
+            --primary-bg: #ffffff;
+            --secondary-bg: #fdfdfd;
+            --text-color: #333333;
+            --border-color: #dddddd;
+            --accent-blue: #2c3e50;
+        }
+
+        body {
+            font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+            background-color: #f0f2f5;
+            color: var(--text-color);
+            line-height: 1.5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .paper {
+            background-color: var(--primary-bg);
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 40px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--text-color);
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+        }
+
+        h1 { margin: 5px 0; font-size: 22pt; letter-spacing: 2px; }
+
+        .instruction-box {
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            margin-bottom: 25px;
+            font-size: 11pt;
+            background-color: var(--secondary-bg);
+            line-height: 1.6;
+        }
+
+        .question-section {
+            margin-bottom: 25px;
+        }
+
+        .question-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .time-input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 20px;
+        }
+
+        input[type="text"], input[type="number"] {
+            border: none;
+            border-bottom: 1px solid #000;
+            padding: 2px 5px;
+            font-size: 11pt;
+            width: 100px;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 10.5pt;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            text-align: center;
+        }
+
+        th { background-color: #f8f9fa; }
+        td:first-child { text-align: left; width: 45%; }
+
+        .radio-group {
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 10.5pt;
+        }
+
+        .footer-note {
+            margin-top: 40px;
+            font-size: 9pt;
+            color: #666;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+
+        .no-print-area {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 11pt;
+            margin: 0 5px;
+        }
+
+        @media print {
+            body { background-color: white; padding: 0; }
+            .paper { box-shadow: none; max-width: 100%; padding: 0; }
+            .no-print-area { display: none; }
+            input { border-bottom: 1px solid #000 !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="paper">
+    <header>
+        <h1>匹茲堡睡眠品質量表 (PSQI)</h1>
+    </header>
+
+    <div class="instruction-box">
+        <b>指導語：</b>以下問題是關於您在<b>過去一個月內</b>的睡眠習慣。您的回答應能反映您在過去一個月中大多數白天與晚上的實際情況。請回答所有問題。
+    </div>
+
+    <div class="question-section">
+        <label class="question-title">1. 過去一個月，您晚上通常幾點上床睡覺？</label>
+        <div class="time-input-group">
+            通常在 <input type="text" placeholder="小時:分鐘"> 上床。
+        </div>
+    </div>
+
+    <div class="question-section">
+        <label class="question-title">2. 過去一個月，您在晚上上床後，通常需要多久（幾分鐘）才能入睡？</label>
+        <div class="time-input-group">
+            約 <input type="number" style="width:60px;"> 分鐘。
+        </div>
+    </div>
+
+    <div class="question-section">
+        <label class="question-title">3. 過去一個月，您早上通常幾點起床？</label>
+        <div class="time-input-group">
+            通常在 <input type="text" placeholder="小時:分鐘"> 起床。
+        </div>
+    </div>
+
+    <div class="question-section">
+        <label class="question-title">4. 過去一個月，您每晚實際睡著的時間約有幾個小時？（這可能與您待在床上的時間不同）</label>
+        <div class="time-input-group">
+            約 <input type="number" step="0.5" style="width:60px;"> 小時。
+        </div>
+    </div>
+
+    <div class="question-section">
+        <label class="question-title">5. 過去一個月，您是否因為下列問題而感到睡眠受擾？</label>
+        <table>
+            <thead>
+                <tr>
+                    <th>睡眠受擾原因</th>
+                    <th>從未發生</th>
+                    <th>每週不到一次</th>
+                    <th>每週一至二次</th>
+                    <th>每週三次或以上</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>a. 無法在 30 分鐘內入睡</td><td>□</td><td>□</td><td>□</td><td>□</td></tr>
+                <tr><td>b. 半夜醒來或早醒</td><td>□</td><td>□</td><td>□</td><td>□</td></tr>
+                <tr><td>c. 必須起來上廁所</td><td>□</td><td>□</td><td>□</td><td>□</td></tr>
+                <tr><td>d. 呼吸不順暢</td><td>□</td><td>□</td><td>□</td><td>□</td></tr>
+                <tr><td>e. 咳嗽或大聲打呼</td><td>□</td><td>□</td><td>□</td><td>□</td></tr>
+                <tr><td>f. 感覺太冷</td><td>□</td><td>□</td><td>□</td><td>□</td></tr>
+                <tr><td>g. 感覺太熱</td><td>□</td><td>□</td><td>□</td><td>□</td></tr>
+                <tr><td>h. 作惡夢</td><td>□</td><td>□</td><td>□</td><td>□</td></tr>
+                <tr><td>i. 身上感覺疼痛</td><td>□</td><td>□</td><td>□</td><td>□</td></tr>
+                <tr><td>j. 其他（請說明：_______）</td><td>□</td><td>□</td><td>□</td><td>□</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="question-section">
+        <label class="question-title">6. 過去一個月，整體而言，您自評您的睡眠品質如何？</label>
+        <div class="radio-group">
+            <div class="radio-item">□ 非常好</div>
+            <div class="radio-item">□ 還算好</div>
+            <div class="radio-item">□ 不太好</div>
+            <div class="radio-item">□ 非常不好</div>
+        </div>
+    </div>
+
+    <div class="question-section">
+        <label class="question-title">7. 過去一個月，您平均每週使用藥物（醫師處方或成藥）來幫助睡眠的頻率？</label>
+        <div class="radio-group">
+            <div class="radio-item">□ 從未發生</div>
+            <div class="radio-item">□ 每週不到一次</div>
+            <div class="radio-item">□ 每週一至二次</div>
+            <div class="radio-item">□ 每週三次或以上</div>
+        </div>
+    </div>
+
+    <div class="question-section">
+        <label class="question-title">8. 過去一個月，當您在開車、用餐或從事社交活動時，感到難以保持清醒的頻率？</label>
+        <div class="radio-group">
+            <div class="radio-item">□ 從未發生</div>
+            <div class="radio-item">□ 每週不到一次</div>
+            <div class="radio-item">□ 每週一至二次</div>
+            <div class="radio-item">□ 每週三次或以上</div>
+        </div>
+    </div>
+
+    <div class="question-section">
+        <label class="question-title">9. 過去一個月，您覺得要在白天打起精神來完成事情有多大的困難？</label>
+        <div class="radio-group">
+            <div class="radio-item">□ 完全沒有困難</div>
+            <div class="radio-item">□ 只有一點困難</div>
+            <div class="radio-item">□ 有些困難</div>
+            <div class="radio-item">□ 非常大的困難</div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        參考來源：Buysse, D.J., et al. (1989). Psychiatry Research, 28(2), 193-213.<br>
+        本量表僅供臨床評估與學術研究參考。
+    </div>
+</div>
+
+<div class="no-print-area">
+    <button class="btn" onclick="window.print()">列印問卷</button>
+    <a href="index.html" class="btn" style="background-color: #6c757d;">返回工具箱</a>
+</div>
+
+</body>
+</html>
+"""
+
+# 將去機構化版本儲存為檔案
+with open("PSQI_Questionnaire_Generic.html", "w", encoding="utf-8") as f:
+    f.write(html_questionnaire_generic)
