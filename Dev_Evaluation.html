@@ -358,7 +358,7 @@
         const currentDate = getTaiwanDate();
 
         // 組合開頭：日期 + 醫師名稱 + 空一行
-        let headerText = `${currentDate} ${doctorName}\n\n`;
+        let headerText = `${currentDate} ${doctorName}\n`;
 
         if (textParts.length === 0) {
             resultText.innerText = headerText + "個案發展目前均在正常/無特殊範圍，無需特別建議。";
