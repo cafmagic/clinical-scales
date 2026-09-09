@@ -47,6 +47,31 @@
             color: #2c3e50;
         }
 
+        /* 醫師資訊區塊 */
+        .doctor-info-box {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            background: #f9f9f9;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .doctor-info-box label {
+            font-weight: bold;
+            color: var(--primary-navy);
+            margin-right: 15px;
+        }
+
+        .doctor-info-box input {
+            padding: 8px 12px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 200px;
+        }
+
         .eval-grid {
             display: grid;
             gap: 15px;
@@ -81,7 +106,6 @@
             gap: 10px;
         }
 
-        /* 隱藏原生單選框，改用按鈕樣式 */
         .options-group input[type="radio"] {
             display: none;
         }
@@ -98,7 +122,6 @@
             user-select: none;
         }
 
-        /* 一般項目：正常狀態 / 特殊項目：無狀態 */
         .options-group input[value="normal"]:checked + label,
         .options-group input[value="none"]:checked + label {
             background: #e0e0e0;
@@ -106,7 +129,6 @@
             border-color: #9e9e9e;
         }
 
-        /* 一般項目：邊緣(臨界)狀態 / 特殊項目：特質狀態 */
         .options-group input[value="borderline"]:checked + label,
         .options-group input[value="trait"]:checked + label {
             background: #fff3e0;
@@ -115,7 +137,6 @@
             font-weight: bold;
         }
 
-        /* 一般項目：遲緩狀態 / 特殊項目：疾病狀態 */
         .options-group input[value="delayed"]:checked + label,
         .options-group input[value="disease"]:checked + label {
             background: #ffebee;
@@ -176,6 +197,7 @@
             color: #2c3e50;
             margin-bottom: 20px;
             min-height: 50px;
+            white-space: pre-wrap; /* 保留換行符號 */
         }
 
         .btn-copy {
@@ -188,7 +210,6 @@
             background-color: #219a52;
         }
 
-        /* 返回按鈕 */
         .back-link {
             display: block;
             text-align: center;
@@ -209,8 +230,15 @@
     </div>
 
     <form id="evalForm">
+        <!-- 醫師與日期資訊設定區 -->
+        <div class="doctor-info-box">
+            <label for="doctorName">評估醫師：</label>
+            <input type="text" id="doctorName" value="張亞帆 主治醫師" placeholder="請輸入醫師職稱與姓名">
+        </div>
+
         <div class="eval-grid" id="grid-container">
-            </div>
+            <!-- 評估項目動態生成 -->
+        </div>
 
         <div class="action-btns">
             <button type="button" class="btn-reset" onclick="resetForm()">重設</button>
@@ -227,7 +255,7 @@
 </div>
 
 <script>
-    // 定義評估項目與對應的早期療育內容（增加 type 區分一般項目與特殊病症）
+    // 定義評估項目與對應的早期療育內容
     const evalItems = [
         { id: '口語理解', therapies: ['語言'], type: 'standard' },
         { id: '口語表達', therapies: ['語言'], type: 'standard' },
@@ -248,7 +276,6 @@
         
         let optionsHtml = '';
         
-        // 依據類別渲染不同選項
         if (item.type === 'standard') {
             optionsHtml = `
                 <input type="radio" id="normal_${index}" name="${item.id}" value="normal" checked>
@@ -282,10 +309,19 @@
         gridContainer.appendChild(row);
     });
 
+    // 取得民國日期格式 (例如: 115年9月9日)
+    function getTaiwanDate() {
+        const today = new Date();
+        const rocYear = today.getFullYear() - 1911;
+        const month = today.getMonth() + 1;
+        const date = today.getDate();
+        return `${rocYear}年${month}月${date}日`;
+    }
+
     // 生成報告邏輯
     function generateReport() {
         let textParts = [];
-        let therapySet = new Set(); // 使用 Set 來確保療育項目不重複
+        let therapySet = new Set(); 
 
         evalItems.forEach(item => {
             const radios = document.getElementsByName(item.id);
@@ -297,7 +333,6 @@
                 }
             }
 
-            // 一般發展項目的文字邏輯
             if (item.type === 'standard') {
                 if (selectedValue === 'borderline') {
                     textParts.push(`於${item.id}發展臨界`);
@@ -307,7 +342,6 @@
                     item.therapies.forEach(t => therapySet.add(t));
                 }
             } 
-            // 注意力不足與自閉的文字邏輯（新增「具有」）
             else if (item.type === 'special') {
                 if (selectedValue === 'trait') {
                     textParts.push(`具有${item.id}特質`);
@@ -320,23 +354,30 @@
         const outputDiv = document.getElementById('outputSection');
         const resultText = document.getElementById('finalResult');
         const copyBtn = document.getElementById('copyBtn');
+        const doctorName = document.getElementById('doctorName').value.trim();
+        const currentDate = getTaiwanDate();
+
+        // 組合開頭：日期 + 醫師名稱 + 空一行
+        let headerText = `${currentDate} ${doctorName}\n\n`;
 
         if (textParts.length === 0) {
-            resultText.innerHTML = "<span style='color:#7f8c8d;'>個案發展目前均在正常/無特殊範圍，無需特別建議。</span>";
-            copyBtn.style.display = 'none';
+            resultText.innerText = headerText + "個案發展目前均在正常/無特殊範圍，無需特別建議。";
+            copyBtn.style.display = 'block';
+            copyBtn.innerText = "複製到剪貼簿";
+            copyBtn.style.backgroundColor = "#27ae60";
         } else {
             const evalString = textParts.join('，');
-            let finalString = `個案經本院聯合評估，${evalString}`;
+            let contentString = `個案經本院聯合評估，${evalString}`;
             
-            // 判斷是否需要加入療育建議 (防呆: 避免輸出「建議早期療育包含等。」)
             if (therapySet.size > 0) {
                 const therapyString = Array.from(therapySet).join('、');
-                finalString += `，建議早期療育包含${therapyString}等。`;
+                contentString += `，建議早期療育包含${therapyString}等。`;
             } else {
-                finalString += `。`;
+                contentString += `。`;
             }
             
-            resultText.innerText = finalString;
+            // 將標頭與內容結合
+            resultText.innerText = headerText + contentString;
             copyBtn.style.display = 'block';
             copyBtn.innerText = "複製到剪貼簿";
             copyBtn.style.backgroundColor = "#27ae60";
@@ -349,6 +390,8 @@
     function resetForm() {
         document.getElementById('evalForm').reset();
         document.getElementById('outputSection').style.display = 'none';
+        // 保持預設醫師名稱
+        document.getElementById('doctorName').value = "張亞帆 主治醫師";
     }
 
     // 複製到剪貼簿功能
