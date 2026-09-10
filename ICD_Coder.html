@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>兒童心智科 ICD 診斷快速生成器 | OPEN-PSY</title>
+    <style>
+        :root {
+            --primary-navy: #2c3e50;
+            --accent-blue: #3498db;
+            --bg-gray: #f4f7f6;
+            --card-white: #ffffff;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+            background-color: var(--bg-gray);
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            padding-bottom: 250px; /* 留給底部面板的空間 */
+        }
+
+        .header-section {
+            max-width: 1200px;
+            margin: 0 auto 20px auto;
+            text-align: center;
+        }
+
+        .header-section h1 {
+            color: var(--primary-navy);
+            margin: 0 0 10px 0;
+            border-bottom: 2px solid var(--accent-blue);
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+
+        .search-bar {
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 30px;
+            outline: none;
+            transition: 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .search-bar input:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .category-card {
+            background: var(--card-white);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-top: 4px solid var(--primary-navy);
+            padding: 15px;
+            transition: 0.2s;
+        }
+
+        .category-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-navy);
+            margin-bottom: 15px;
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 6px;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .checkbox-item:hover {
+            background-color: #f0f7fb;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-top: 4px;
+            margin-right: 12px;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+
+        .checkbox-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .code-title {
+            font-weight: bold;
+            color: var(--primary-navy);
+            font-size: 1.05rem;
+        }
+
+        .code-en {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+        }
+
+        /* 底部浮動結果面板 */
+        .bottom-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--card-white);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 100;
+            border-top: 3px solid var(--accent-blue);
+        }
+
+        .bottom-panel-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .output-area {
+            flex: 1;
+        }
+
+        .output-area textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            font-size: 1.1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            resize: none;
+            outline: none;
+            background: #fdfefe;
+            color: #2c3e50;
+            line-height: 1.5;
+        }
+
+        .action-area {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 150px;
+        }
+
+        .btn {
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: center;
+        }
+
+        .btn-copy {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .btn-copy:hover { background-color: #219a52; }
+
+        .btn-clear {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .btn-clear:hover { background-color: #7f8c8d; }
+
+        /* 隱藏項目 (搜尋用) */
+        .hidden { display: none !important; }
+
+        @media (max-width: 768px) {
+            .bottom-panel-content { flex-direction: column; }
+            .action-area { width: 100%; flex-direction: row; }
+            .btn { flex: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header-section">
+    <h1>兒童心智科 ICD 診斷快速生成器</h1>
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="搜尋診斷碼、中文或英文 (例如: F84, 注意力, Autism)..." onkeyup="filterCodes()">
+    </div>
+</div>
+
+<div class="grid-container" id="gridContainer">
+    <!-- 分類與代碼將由 JavaScript 動態生成 -->
+</div>
+
+<!-- 底部結果面板 -->
+<div class="bottom-panel">
+    <div class="bottom-panel-content">
+        <div class="output-area">
+            <textarea id="outputText" readonly placeholder="勾選上方的診斷碼後，這裡會自動產生可複製的文字..."></textarea>
+        </div>
+        <div class="action-area">
+            <button class="btn btn-copy" id="copyBtn" onclick="copyResult()">📋 複製內容</button>
+            <button class="btn btn-clear" onclick="clearSelection()">清除重選</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 依據您整理的兒童心智科核心診斷資料庫架構建置
+    const icdDatabase = [
+        {
+            category: "諮詢與衛教 (Z碼)",
+            items: [
+                { code: "Z71.9", zh: "諮詢", en: "Counseling" },
+                { code: "Z71.89", zh: "其他特定之諮詢", en: "Other specified counseling" }
+            ]
+        },
+        {
+            category: "腦部與器質性疾患 (G碼)",
+            items: [
+                { code: "G93.9", zh: "腦部疾患", en: "Disorder of brain, unspecified" },
+                { code: "G93.89", zh: "腦部其他特定疾患", en: "Other specified disorders of brain" }
+            ]
+        },
+        {
+            category: "發展延遲與症狀 (R碼)",
+            items: [
+                { code: "R62.0", zh: "兒童期發展延遲", en: "Delayed milestone in childhood" },
+                { code: "R62.50", zh: "兒童期生理發育不符正常預期", en: "Unspecified lack of expected normal physiological development in childhood" },
+                { code: "R41.83", zh: "邊緣性智能", en: "Borderline intellectual functioning" },
+                { code: "R41.840", zh: "注意力及集中力障礙", en: "Attention and concentration deficit" }
+            ]
+        },
+        {
+            category: "全面性發展遲緩 (GDD)",
+            items: [
+                { code: "F88", zh: "其他心理發展疾患", en: "Other disorders of psychological development" }
+            ]
+        },
+        {
+            category: "智能不足 (MR)",
+            items: [
+                { code: "F70", zh: "輕度智能不足", en: "Mild intellectual disabilities" },
+                { code: "F71", zh: "中度智能不足", en: "Moderate intellectual disabilities" },
+                { code: "F72", zh: "重度智能不足", en: "Severe intellectual disabilities" },
+                { code: "F73", zh: "極重度智能不足", en: "Profound intellectual disabilities" },
+                { code: "F79", zh: "智能不足", en: "Intellectual disabilities" }
+            ]
+        },
+        {
+            category: "自閉症類群 (ASD)",
+            items: [
+                { code: "F84.0", zh: "自閉症", en: "Autistic disorder" },
+                { code: "F84.1", zh: "非典型自閉症", en: "Atypical autism" },
+                { code: "F84.2", zh: "雷特氏症候群", en: "Rett's syndrome" },
+                { code: "F84.3", zh: "其他兒童期崩解疾患", en: "Other childhood disintegrative disorder" },
+                { code: "F84.4", zh: "伴有心智遲滯及刻板動作之過動疾患", en: "Overactive disorder assoc. with mental retardation and stereotyped movements" },
+                { code: "F84.5", zh: "亞斯伯格症候群", en: "Asperger's syndrome" },
+                { code: "F84.8", zh: "其他廣泛性發展疾患", en: "Other pervasive developmental disorders" },
+                { code: "F84.9", zh: "未明示之廣泛性發展疾患", en: "Pervasive developmental disorder, unspecified" }
+            ]
+        },
+        {
+            category: "注意力不足過動症 (ADHD)",
+            items: [
+                { code: "F90.0", zh: "注意力缺失過動疾患，主要為注意力不足型", en: "Attention-deficit hyperactivity disorder, predominantly inattentive type" },
+                { code: "F90.1", zh: "注意力缺失過動疾患，主要為過動型", en: "Attention-deficit hyperactivity disorder, predominantly hyperactive type" },
+                { code: "F90.2", zh: "注意力缺失過動疾患，複合型", en: "Attention-deficit hyperactivity disorder, combined type" },
+                { code: "F90.8", zh: "注意力缺失過動疾患，其他型", en: "Attention-deficit hyperactivity disorder, other type" },
+                { code: "F90.9", zh: "注意力缺失過動疾患，未明示型", en: "Attention-deficit hyperactivity disorder, unspecified type" }
+            ]
+        },
+        {
+            category: "言語及語言發展疾患",
+            items: [
+                { code: "F80.0", zh: "特定言語構音障礙", en: "Specific speech articulation disorder" },
+                { code: "F80.1", zh: "表達性語言疾患", en: "Expressive language disorder" },
+                { code: "F80.2", zh: "混合型語言接受-表達疾患", en: "Mixed receptive-expressive language disorder" },
+                { code: "F80.3", zh: "伴有癲癇之獲得性失語症", en: "Acquired aphasia with epilepsy" },
+                { code: "F80.4", zh: "聽障所致之言語及語言發展遲緩", en: "Speech and language development delay due to hearing loss" },
+                { code: "F80.8", zh: "其他言語及語言發展疾患", en: "Other developmental disorders of speech and language" },
+                { code: "F80.9", zh: "說話及語言發展疾患", en: "Developmental disorder of speech and language, unspecified" }
+            ]
+        },
+        {
+            category: "動作功能發展疾患",
+            items: [
+                { code: "F82", zh: "明示動作功能發展疾患", en: "Specific developmental disorder of motor function" }
+            ]
+        },
+        {
+            category: "學業技能發展疾患",
+            items: [
+                { code: "F81.0", zh: "特定閱讀障礙", en: "Specific reading disorder" },
+                { code: "F81.1", zh: "特定拼寫障礙", en: "Specific spelling disorder" },
+                { code: "F81.2", zh: "特定算數技能障礙", en: "Specific disorder of arithmetical skills" },
+                { code: "F81.3", zh: "混合型學業技能障礙", en: "Mixed disorder of scholastic skills" },
+                { code: "F81.8", zh: "其他學業技能發展疾患", en: "Other developmental disorders of scholastic skills" },
+                { code: "F81.9", zh: "未明示之學業技能發展疾患", en: "Developmental disorder of scholastic skills, unspecified" }
+            ]
+        },
+        {
+            category: "抽動症 (Tic Disorders)",
+            items: [
+                { code: "F95.0", zh: "暫時性抽動疾患", en: "Transient tic disorder" },
+                { code: "F95.1", zh: "慢性運動或發聲抽動疾患", en: "Chronic motor or vocal tic disorder" },
+                { code: "F95.2", zh: "妥瑞氏症", en: "Tourette's syndrome" },
+                { code: "F95.9", zh: "未明示之抽動疾患", en: "Tic disorder, unspecified" }
+            ]
+        },
+        {
+            category: "情緒與社會功能疾患",
+            items: [
+                { code: "F93.0", zh: "兒童期分離焦慮疾患", en: "Separation anxiety disorder of childhood" },
+                { code: "F93.1", zh: "兒童期畏懼焦慮疾患", en: "Phobic anxiety disorder of childhood" },
+                { code: "F93.2", zh: "兒童期社交焦慮疾患", en: "Social anxiety disorder of childhood" },
+                { code: "F93.3", zh: "手足競爭疾患", en: "Sibling rivalry disorder" },
+                { code: "F93.8", zh: "其他兒童期情緒疾患", en: "Other childhood emotional disorders" },
+                { code: "F93.9", zh: "未明示之兒童期情緒疾患", en: "Childhood emotional disorder, unspecified" },
+                { code: "F94.0", zh: "選擇性緘默症", en: "Elective mutism" },
+                { code: "F94.1", zh: "反應性依附疾患", en: "Reactive attachment disorder" },
+                { code: "F94.2", zh: "兒童期去抑制型依附疾患", en: "Disinhibited attachment disorder of childhood" },
+                { code: "F94.8", zh: "其他兒童期社會功能疾患", en: "Other childhood disorders of social functioning" },
+                { code: "F94.9", zh: "未明示之兒童期社會功能疾患", en: "Childhood disorder of social functioning, unspecified" }
+            ]
+        },
+        {
+            category: "行為疾患 (Conduct Disorders)",
+            items: [
+                { code: "F91.0", zh: "侷限於家庭內之行為疾患", en: "Conduct disorder confined to the family context" },
+                { code: "F91.1", zh: "行為疾患，兒童期發作型", en: "Conduct disorder, childhood-onset type" },
+                { code: "F91.2", zh: "行為疾患，青春期發作型", en: "Conduct disorder, adolescent-onset type" },
+                { code: "F91.3", zh: "對立反抗性疾患", en: "Oppositional defiant disorder (ODD)" },
+                { code: "F91.8", zh: "其他行為疾患", en: "Other conduct disorders" },
+                { code: "F91.9", zh: "未明示之行為疾患", en: "Conduct disorder, unspecified" }
+            ]
+        },
+        {
+            category: "遺尿及其他行為疾患",
+            items: [
+                { code: "N39.44", zh: "夜間遺尿", en: "Nocturnal enuresis" },
+                { code: "F98.0", zh: "非器質性遺尿症", en: "Nonorganic enuresis" },
+                { code: "F98.1", zh: "非器質性遺屎症", en: "Nonorganic encopresis" },
+                { code: "F98.2", zh: "嬰兒及兒童期之餵食疾患", en: "Feeding disorder of infancy and childhood" },
+                { code: "F98.3", zh: "嬰幼兒異食癖", en: "Pica of infancy and childhood" },
+                { code: "F98.4", zh: "刻板性動作疾患", en: "Stereotyped movement disorders" },
+                { code: "F98.5", zh: "結巴 (口吃)", en: "Stuttering" }
+            ]
+        }
+    ];
+
+    const container = document.getElementById('gridContainer');
+    let selectedCodes = [];
+
+    // 初始化渲染介面
+    function renderGrid() {
+        icdDatabase.forEach((cat, catIndex) => {
+            const card = document.createElement('div');
+            card.className = 'category-card';
+            card.setAttribute('data-cat-index', catIndex);
+            
+            let cardHtml = `<div class="category-title">${cat.category}</div>`;
+            
+            cat.items.forEach((item, itemIndex) => {
+                // 創造唯一ID
+                const uid = `code_${catIndex}_${itemIndex}`;
+                cardHtml += `
+                    <label class="checkbox-item" for="${uid}">
+                        <input type="checkbox" id="${uid}" value="${item.code}" 
+                               data-zh="${item.zh}" data-en="${item.en}" 
+                               onchange="updateSelection(this)">
+                        <div class="checkbox-content">
+                            <span class="code-title">${item.code} ${item.zh}</span>
+                            <span class="code-en">${item.en}</span>
+                        </div>
+                    </label>
+                `;
+            });
+            card.innerHTML = cardHtml;
+            container.appendChild(card);
+        });
+    }
+
+    // 更新選取內容與下方文字框
+    function updateSelection(checkboxElem) {
+        const code = checkboxElem.value;
+        const zh = checkboxElem.getAttribute('data-zh');
+        const en = checkboxElem.getAttribute('data-en');
+        const outputLine = `${code} ${zh} ${en}`;
+
+        if (checkboxElem.checked) {
+            selectedCodes.push(outputLine);
+        } else {
+            selectedCodes = selectedCodes.filter(item => item !== outputLine);
+        }
+        
+        document.getElementById('outputText').value = selectedCodes.join('\n');
+        
+        // 重置按鈕狀態
+        const copyBtn = document.getElementById('copyBtn');
+        copyBtn.innerText = "📋 複製內容";
+        copyBtn.style.backgroundColor = "#27ae60";
+    }
+
+    // 搜尋過濾功能
+    function filterCodes() {
+        const input = document.getElementById('searchInput').value.toLowerCase();
+        const cards = document.getElementsByClassName('category-card');
+
+        for (let card of cards) {
+            const items = card.getElementsByClassName('checkbox-item');
+            let hasVisibleItem = false;
+
+            for (let item of items) {
+                const text = item.innerText.toLowerCase();
+                if (text.includes(input)) {
+                    item.classList.remove('hidden');
+                    hasVisibleItem = true;
+                } else {
+                    item.classList.add('hidden');
+                }
+            }
+
+            // 若該分類下沒有符合的項目，則隱藏整張卡片
+            if (hasVisibleItem) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        }
+    }
+
+    // 複製到剪貼簿
+    function copyResult() {
+        const text = document.getElementById('outputText').value;
+        if (!text) return;
+
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = document.getElementById('copyBtn');
+            btn.innerText = "✓ 已複製！";
+            btn.style.backgroundColor = "#2c3e50";
+        }).catch(err => {
+            alert('複製失敗，請手動複製');
+        });
+    }
+
+    // 清除重選
+    function clearSelection() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(cb => cb.checked = false);
+        selectedCodes = [];
+        document.getElementById('outputText').value = "";
+        
+        const copyBtn = document.getElementById('copyBtn');
+        copyBtn.innerText = "📋 複製內容";
+        copyBtn.style.backgroundColor = "#27ae60";
+    }
+
+    // 啟動渲染
+    renderGrid();
+</script>
+
+</body>
+</html>
