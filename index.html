@@ -182,18 +182,19 @@
 </header>
 
 <div class="search-container">
-    <input type="text" id="toolSearch" placeholder="搜尋關鍵字... (例如: PSQI, SNAP, 資源)" onkeyup="filterTools()">
+    <input type="text" id="toolSearch" placeholder="搜尋關鍵字... (例如: PSQI, SNAP, 資源, ICD)" onkeyup="filterTools()">
 </div>
 
 <div class="main-content" id="toolGrid">
     
-    <div class="category-card" data-keywords="兒童發展 child development adhd asd 注意力不足 過動症 自閉症 亞斯伯格 聯評 遲緩 早療 snap snap-iv">
+    <div class="category-card" data-keywords="兒童發展 child development adhd asd 注意力不足 過動症 自閉症 亞斯伯格 聯評 遲緩 早療 snap snap-iv icd icd-10 診斷碼 兒心">
         <h2>兒童發展 <small>Child Development</small></h2>
         <ul class="tool-list">
             <li class="tool-item">
                 <span class="tool-name">聯合評估 (Early Intervention)</span>
                 <div class="sub-links">
-                    <a href="Dev_Evaluation.html">病歷報告生成器</a>
+                    <a href="Dev_Evaluation.html">早療報告生成器</a>
+                    <a href="ICD_Coder.html">兒心ICD診斷碼生成器</a>
                 </div>
             </li>
             <li class="tool-item">
@@ -244,24 +245,24 @@
     </div>
 
     <div class="category-card" data-keywords="憂鬱 depression bdi bdi2 bdi-ii byi bdi-y 貝克">
-            <h2>憂鬱 <small>Depression</small></h2>
-            <ul class="tool-list">
-                <li class="tool-item">
-                            <span class="tool-name">成人憂鬱評估 (Adults)</span>
-                            <div class="sub-links">
-                                <a href="BDI_II.html">BDI-II 貝克憂鬱量表</a>
-                                <a href="PHQ9.html">PHQ-9 病人健康問卷</a>
-                            </div>
-                    </li>
-                <li class="tool-item">
-                    <span class="tool-name">兒童與青少年憂鬱評估 (Youth)</span>
-                    <div class="sub-links">
-                        <a href="BYI.html">BYI 貝克兒青憂鬱量表</a>
-                        <a href="DSRSC.html">DSRSC 兒童抑鬱自評量表</a>
-                    </div>
-                </li>
-            </ul>
-        </div>
+        <h2>憂鬱 <small>Depression</small></h2>
+        <ul class="tool-list">
+            <li class="tool-item">
+                <span class="tool-name">成人憂鬱評估 (Adults)</span>
+                <div class="sub-links">
+                    <a href="BDI_II.html">BDI-II 貝克憂鬱量表</a>
+                    <a href="PHQ9.html">PHQ-9 病人健康問卷</a>
+                </div>
+            </li>
+            <li class="tool-item">
+                <span class="tool-name">兒童與青少年憂鬱評估 (Youth)</span>
+                <div class="sub-links">
+                    <a href="BYI.html">BYI 貝克兒青憂鬱量表</a>
+                    <a href="DSRSC.html">DSRSC 兒童抑鬱自評量表</a>
+                </div>
+            </li>
+        </ul>
+    </div>
 
     <div class="category-card" data-keywords="焦慮 anxiety scared 廣泛性焦慮 社交 懼學 分離焦慮 cssi 軀體化 身體不適 肚子痛">
         <h2>焦慮與軀體化 <small>Anxiety & Somatic</small></h2>
@@ -297,7 +298,7 @@
             </li>
         </ul>
     </div>
-    
+
     <div id="noResults">找不到相關量表。</div>
 </div>
 
